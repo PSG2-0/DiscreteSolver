@@ -1,0 +1,10 @@
+# tg_bot
+requests==2.31.0
+aiogram==2.14.3
+aiohttp==3.8.1
+
+# api and math
+fastapi==0.103.2
+matplotlib==3.8.0
+numpy==1.26.0
+uvicorn==0.23.2
