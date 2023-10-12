@@ -124,7 +124,7 @@ class TransitiveRelationGenerator:
 def dataset_creation(num_samples_per_type, realtion_type):   
     dataset = []
     for _ in range(num_samples_per_type):
-        n = random.randint(2, 15)
+        n = random.randint(2, 30)
         use_letters = random.choice([True, False])
 
         if realtion_type == "Reflexive":
@@ -158,10 +158,10 @@ def dataset_creation(num_samples_per_type, realtion_type):
     df = pd.DataFrame(data_as_dicts)
 
     if realtion_type == "Reflexive":
-        df.to_csv("data/df_reflexive.csv")
+        df.to_csv("data/df_reflexive.csv", index=False)
     elif realtion_type == "Symmetric":
-        df.to_csv("data/df_symmetric.csv")
+        df.to_csv("data/df_symmetric.csv", index=False)
     elif realtion_type == "Transitive":
-        df.to_csv("data/df_transitive.csv")
+        df.to_csv("data/df_transitive.csv", index=False)
 
     return df
