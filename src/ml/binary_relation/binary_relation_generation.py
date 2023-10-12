@@ -121,26 +121,26 @@ class TransitiveRelationGenerator:
                 R.add((selected_pair[0], next_element))
         return R, self.M
 
-def dataset_creation(num_samples_per_type, realtion_type):   
+def dataset_creation(num_samples_per_type, relation_type):   
     dataset = []
     for _ in range(num_samples_per_type):
         n = random.randint(2, 30)
         use_letters = random.choice([True, False])
 
-        if realtion_type == "Reflexive":
+        if relation_type == "Reflexive":
             generator = ReflexiveRelationGenerator(n, use_letters)
             dataset.append((generator.generate_reflexive_set(), "Рефлексивное"))
             dataset.append((generator.generate_antireflexive_set(), "Антирефлексивное"))
             dataset.append((generator.generate_nonreflexive_set(), "Нерефлексивное"))
 
-        elif realtion_type == "Symmetric":
+        elif relation_type == "Symmetric":
             generator = SymmetricRelationGenerator(n, use_letters)
             dataset.append((generator.generate_symmetric_set(), "Симметричное"))
             dataset.append((generator.generate_asymmetric_set(), "Асимметричное"))
             dataset.append((generator.generate_antisymmetric_set(), "Антисимметричное"))
             dataset.append((generator.generate_nonsymmetric_set(), "Несимметричное"))
 
-        elif realtion_type == "Transitive":
+        elif relation_type == "Transitive":
             generator = TransitiveRelationGenerator(n, use_letters)
             dataset.append((generator.generate_transitive_set(), "Транзитивное"))
             dataset.append((generator.generate_antitransitive_set(), "Антитранзитивное"))
@@ -157,11 +157,11 @@ def dataset_creation(num_samples_per_type, realtion_type):
 
     df = pd.DataFrame(data_as_dicts)
 
-    if realtion_type == "Reflexive":
+    if relation_type == "Reflexive":
         df.to_csv("data/df_reflexive.csv", index=False)
-    elif realtion_type == "Symmetric":
+    elif relation_type == "Symmetric":
         df.to_csv("data/df_symmetric.csv", index=False)
-    elif realtion_type == "Transitive":
+    elif relation_type == "Transitive":
         df.to_csv("data/df_transitive.csv", index=False)
 
     return df
