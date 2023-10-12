@@ -7,6 +7,7 @@ class RelationDataPreprocessing:
 
     def remove_rows_with_nan(self):
         self.df.dropna(inplace=True)
+        self.df.reset_index(drop=True, inplace=True)
 
     def compute_power_of_set(self):
         self.df['Power Of Set'] = self.df['M'].apply(lambda x: len(x.split(',')))
