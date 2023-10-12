@@ -124,7 +124,7 @@ class TransitiveRelationGenerator:
 def dataset_creation(num_samples_per_type, relation_type):   
     dataset = []
     for _ in range(num_samples_per_type):
-        n = random.randint(2, 30)
+        n = random.randint(2, 26)
         use_letters = random.choice([True, False])
 
         if relation_type == "Reflexive":
