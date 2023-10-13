@@ -13,13 +13,17 @@ class ReflexiveRelationGenerator:
     
     def generate_reflexive_set(self):
         R = {(i, i) for i in self.M}
-        additional_pairs_count = random.randint(1, self.n * (self.n - 1))
-        additional_pairs = set()
-        while len(additional_pairs) < additional_pairs_count:
-            i, j = random.sample(self.M, 2)
-            additional_pairs.add((i, j))
-        R.update(additional_pairs)
-        return R, self.M
+        additional_pairs_is = random.choice([True, False])
+        if (additional_pairs_is == True):
+            additional_pairs_count = random.randint(1, self.n * (self.n - 1))
+            additional_pairs = set()
+            while len(additional_pairs) < additional_pairs_count:
+                i, j = random.sample(self.M, 2)
+                additional_pairs.add((i, j))
+            R.update(additional_pairs)
+            return R, self.M
+        else:
+            return R, self.M
     
     def generate_antireflexive_set(self):
         R = {(i, j) for i in self.M for j in self.M if i != j and random.choice([True, False])}
