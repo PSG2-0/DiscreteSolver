@@ -1,9 +1,17 @@
 import pandas as pd
+import torch
+from transformers import BertTokenizer, BertModel
+from tqdm import tqdm
 
 class RelationDataPreprocessing:
+    TOKENIZER_PATH = 'bert-base-multilingual-cased'
+    MODEL_PATH = 'bert-base-multilingual-cased'
+    MAX_TOKEN_LENGTH = 512
 
     def __init__(self, df: pd.DataFrame):
         self.df = df
+        self.tokenizer = BertTokenizer.from_pretrained(self.TOKENIZER_PATH)
+        self.model = BertModel.from_pretrained(self.MODEL_PATH)
 
     def remove_rows_with_nan(self):
         self.df.dropna(inplace=True)
@@ -70,6 +78,37 @@ class RelationDataPreprocessing:
     def move_type_to_end(self):
         cols = [col for col in self.df.columns if col != 'Type'] + ['Type']
         self.df = self.df[cols]
+
+    def tokenizing_data(self):
+        column_r_list = self.df['R'].astype(str).tolist()
+        column_m_list = self.df['M'].astype(str).tolist()
+
+        final_r = self._tokenize_column(column_r_list)
+        final_m = self._tokenize_column(column_m_list)
+
+        r_dim = len(final_r[0])
+        m_dim = len(final_m[0])
+
+        r_columns = [f"R_{i}" for i in range(r_dim)]
+        m_columns = [f"M_{i}" for i in range(m_dim)]
+
+        df_r = pd.DataFrame(final_r, columns=r_columns)
+        df_m = pd.DataFrame(final_m, columns=m_columns)
+
+        self.df.drop(['R', 'M'], axis=1, inplace=True)
+
+        self.df = pd.concat([df_r, df_m, self.df], axis=1)
+
+    def _tokenize_column(self, column_list):
+        results = []
+        for el in tqdm(column_list):
+            inputs = self.tokenizer(el, return_tensors='pt', truncation=True, padding=True, max_length=self.MAX_TOKEN_LENGTH)
+            
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+            
+            results.append(outputs['last_hidden_state'].mean(dim=1).squeeze().numpy())
+        return results
 
     def get_dataframe(self) -> pd.DataFrame:
         return self.df
