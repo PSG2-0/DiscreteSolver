@@ -1,4 +1,3 @@
-# calc_elements_of_set.py
 from set_simplifier import SetSimplifier
 import ast
 
