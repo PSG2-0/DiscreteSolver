@@ -1,4 +1,4 @@
-from set_simplifier import SetSimplifier
+from ..set_theory.set_simplifier import SetSimplifier
 import ast
 
 class SetCalculator:

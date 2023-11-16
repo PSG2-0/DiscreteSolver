@@ -63,3 +63,7 @@ def arithmetic_decode(encoded_value: float = Body(...), probabilities: List[floa
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
