@@ -2,7 +2,7 @@ version: '3.8'
 services:
   api:
     build:
-      context: ./src/api
+      context: .
     ports:
       - "8000:8000"
     volumes:
