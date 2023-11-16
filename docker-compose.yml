@@ -3,9 +3,8 @@ services:
   api:
     build:
       context: .
-      dockerfile: src/api/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/usr/src/app
+      - .:/usr/src/app
     restart: unless-stopped
