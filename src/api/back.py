@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException, Body
+import requests
+from fastapi.responses import StreamingResponse
+import io
 from typing import List
 from src.math_algos.binary_relation.properties_of_relation import BinaryRelation
 from src.math_algos.set_theory.set_simplifier import SetSimplifier
+from fastapi.responses import FileResponse
+from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
 
@@ -23,6 +28,22 @@ def simplify_set(expression: str = Body(...)):
         simplified_expr = simplifier.simplify_expression(expression)
         result = simplifier.reverse_transform(simplified_expr)
         return {"simplified_expression": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/venn-diagram/")
+async def create_venn_diagram(expression: str = Body(...)):
+    try:
+        diagram_builder = VennDiagramBuilder("YOUR API KEY")
+        diagram_url = diagram_builder.build_diagram(expression)
+        if diagram_url.startswith("http"):
+            image_response = requests.get(diagram_url)
+            if image_response.status_code == 200:
+                return StreamingResponse(io.BytesIO(image_response.content), media_type="image/png")
+            else:
+                raise HTTPException(status_code=500, detail="Error while collecting an image")
+        else:
+            raise HTTPException(status_code=400, detail=diagram_url)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
