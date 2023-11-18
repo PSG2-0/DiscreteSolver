@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Body
 import requests
 from fastapi.responses import StreamingResponse
 import io
+from decimal import Decimal, getcontext
 from typing import List
 from src.math_algos.binary_relation.properties_of_relation import BinaryRelation
 from src.math_algos.set_theory.set_simplifier import SetSimplifier
@@ -9,6 +10,8 @@ from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
+
+getcontext().prec = 500
 
 app = FastAPI(title="DiscreteSolver API")
 
@@ -64,19 +67,27 @@ def arithmetic_encode(string: str = Body(...)):
         letters, probabilities = probability_calculator.get_probabilities()
         coder = ArithmeticCoder(letters, probabilities)
         encoded_value = coder.encode(string)
+
+        encoded_value_str = str(encoded_value)
+        probabilities_str = [str(prob) for prob in probabilities]
+
         return {
-            "encoded_value": encoded_value,
+            "encoded_value": encoded_value_str,
+            "probabilities": probabilities_str,
             "alphabet": letters,
-            "probabilities": probabilities
+            "original_length_of_string": len(string),
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/arithmetic-decode/")
-def arithmetic_decode(encoded_value: float = Body(...), probabilities: List[float] = Body(...), alphabet: List[str] = Body(...), original_length_of_string: int = Body(...)):
+def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] = Body(...), alphabet: List[str] = Body(...), original_length_of_string: int = Body(...)):
     try:
         if len(alphabet) != len(probabilities):
             raise ValueError("Alphabet and probabilities list must be of the same length")
+
+        encoded_value = Decimal(encoded_value)
+        probabilities = [Decimal(p) for p in probabilities]
 
         length = len(alphabet)
         coder = ArithmeticCoder(alphabet, probabilities)
