@@ -49,6 +49,13 @@
     - Constructing Euler-Venn diagrams <u>(k6zma)</u>
     - Calculating Set Elements <u>(k6zma)</u>
 
+- <b>Bulean Algebra:</b>
+    - Bulding Carno cards <u>(taissam)</u>
+    - Bulding CDNF and CKNF <u>(taissam)</u>
+    - Finding minterms and maxterms <u>(taissam)</u>
+    - Construction of reduced, minimal, and dead-end DNFs <u>(taissam)</u>
+    - Construction of a truth table <u>(taissam)</u>
+
 - <b>Binary relationships:</b>
     - Calculating properties of a binary relation <u>(k6zma)</u>
 
