@@ -93,13 +93,13 @@ class BinaryRelation:
             if is_true:
                 properties_list.append(property_name)
         
-        if symmetry_properties["Асимметрично"]:
-            properties_list.append("Асимметрично")
+        if symmetry_properties["Антисимметрично"]:
+            properties_list.append("Антисимметрично")
         else:
             if symmetry_properties["Симметрично"]:
                 properties_list.append("Симметрично")
-            elif symmetry_properties["Антисимметрично"]:
-                properties_list.append("Антисимметрично")
+            elif symmetry_properties["Асимметрично"]:
+                properties_list.append("Асимметрично")
             if symmetry_properties["Несимметрично"]:
                 properties_list.append("Несимметрично")
                 
