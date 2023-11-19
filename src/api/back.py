@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
+from ..math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
 
 getcontext().prec = 500
 
@@ -95,6 +96,16 @@ def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] =
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+@app.post("/simplify-boolean-expression/")
+def simplify_boolean_expression(expression: str = Body(...)):
+    try:
+        simplifier = LogicSimplifier()
+        simplified_expr = simplifier.simplify_expression(expression)
+        result = simplifier.reverse_transform(simplified_expr)
+        return {"simplified_expression": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))    
     
 if __name__ == "__main__":
     import uvicorn
