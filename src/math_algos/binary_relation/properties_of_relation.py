@@ -70,10 +70,10 @@ class BinaryRelation:
                     is_transitive = False
                     break
 
-        is_antitransitive = not is_transitive and all((a, c) not in self.relation_set
-                                                    for a, b in self.relation_set
-                                                    for c, d in self.relation_set
-                                                    if b == c and a != d)
+        is_antitransitive = not is_transitive and all((a, d) not in self.relation_set
+                                                      for a, b in self.relation_set
+                                                      for c, d in self.relation_set
+                                                      if b == c and a != d)
 
         is_nontransitive = not is_transitive and not is_antitransitive
 
