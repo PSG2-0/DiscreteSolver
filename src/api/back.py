@@ -10,7 +10,8 @@ from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
-from ..math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
+from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
+from src.math_algos.bulean_algebra.truth_table import TruthTableGenerator
 
 getcontext().prec = 500
 
@@ -104,6 +105,15 @@ def simplify_boolean_expression(expression: str = Body(...)):
         simplified_expr = simplifier.simplify_expression(expression)
         result = simplifier.reverse_transform(simplified_expr)
         return {"simplified_expression": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))    
+    
+@app.post("/generate-truth-table/")
+async def generate_truth_table_endpoint(expression: str = Body(...)):
+    try:
+        generator = TruthTableGenerator(expression)
+        image_buffer = generator.create_truth_table_image()
+        return StreamingResponse(image_buffer, media_type="image/png")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))    
     

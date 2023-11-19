@@ -1,4 +1,4 @@
-from sympy import symbols, simplify_logic, Or, And, Not, Nand, Nor
+from sympy import symbols, simplify_logic
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
 import re
 
@@ -14,15 +14,27 @@ class LogicSimplifier:
         sympy_symbols = {var: symbols(var) for var in variables}
         local_dict = sympy_symbols.copy()
 
-        expr_str = expr_str.replace('∧', '&').replace('∨', '|')
-        expr_str = expr_str.replace('⊕', '^').replace('=', '==').replace('¬', '~')
-        expr_str = expr_str.replace('←', '<<').replace('→', '>>').replace('↑', 'Nand')
+        expr_str = expr_str.replace('∧', '&').replace('∨', '|').replace('⊕', '^').replace('¬', '~')
+        expr_str = expr_str.replace('←', '<<').replace('→', '>>')
 
+        expr_str = re.sub(r'(\b\w+)\s*=\s*(\b\w+)', r'Equivalent(\1, \2)', expr_str)
         expr_str = re.sub(r'(\b\w+)\s*↓\s*(\b\w+)', r'Nor(\1, \2)', expr_str)
+        expr_str = re.sub(r'(\b\w+)\s*↑\s*(\b\w+)', r'Nand(\1, \2)', expr_str)
 
-        expr = parse_expr(expr_str, transformations=self.transformations, local_dict=local_dict)
-        simplified_expr = simplify_logic(expr, form='dnf', force=True)
-        return simplified_expr
+        try:
+            expr = parse_expr(expr_str, transformations=self.transformations, local_dict=local_dict)
+            simplified_expr = simplify_logic(expr, form='dnf', force=True)
+            return simplified_expr
+        except Exception as e:
+            print(f"Error parsing expression: {expr_str}")
+
+        try:
+            expr = parse_expr(expr_str, transformations=self.transformations, local_dict=local_dict)
+            simplified_expr = simplify_logic(expr, form='dnf', force=True)
+            return simplified_expr
+        except Exception as e:
+            print(f"Error parsing expression: {expr_str}")
+            raise e
 
     def reverse_transform(self, simplified_expr):
         expr_str = str(simplified_expr)
