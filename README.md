@@ -39,9 +39,8 @@
 ## Development team:
 - <b>k6zma</b> <i>(@k6zma)</i> - Algorithms, API, DevOps, ML, TG Bot
 - <b>std46d6b</b> <i>(@m4lvx)</i> - Design, Frontend
-- <b>taisssam</b> <i>(@taisssam)</i> - Algorithms, Android app
-- <b>cgsgNK5</b> <i>(@zzz20thcenturyboyzzz)</i> - Dekstop app
-- <b>egorlim</b> <i>(@eg_l1mkka)</i> - IOS app
+- <b>taisssam</b> <i>(@taisssam)</i> - Algorithms, Android app, IOS app
+- <b>cgsgNK5</b> <i>(@killmefasterdear)</i> - Dekstop app
 
 ## Current stage of development:
 - <b>Set theory:</b>
@@ -54,7 +53,8 @@
     - Bulding CDNF and CKNF <u>(taissam)</u>
     - Finding minterms and maxterms <u>(taissam)</u>
     - Construction of reduced, minimal, and dead-end DNFs <u>(taissam)</u>
-    - Construction of a truth table <u>(taissam)</u>
+    - Construction of a truth table <u>(k6zma)</u>
+    - Simplifying Bulean Expressions <u>(k6zma)</u>
 
 - <b>Binary relationships:</b>
     - Calculating properties of a binary relation <u>(k6zma)</u>
