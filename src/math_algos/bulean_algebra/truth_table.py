@@ -49,8 +49,3 @@ class TruthTableGenerator:
         buffer.seek(0)
 
         return buffer
-
-# Example usage
-expression = "A & B | ~C"
-generator = TruthTableGenerator(expression)
-truth_table_image = generator.create_truth_table_image()
