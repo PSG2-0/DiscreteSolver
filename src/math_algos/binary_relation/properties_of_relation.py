@@ -2,8 +2,6 @@ class BinaryRelation:
     def __init__(self, set_of_elements=None, binary_relation=None):
         self.relation_set = self._create_relation_set(binary_relation)
         self.elements = self._create_set_of_elements(set_of_elements, binary_relation)
-        print("relation_set:", self.relation_set)
-        print("elements:", self.elements)
 
     def _create_set_of_elements(self, set_of_elements, binary_relation):
         if set_of_elements:
@@ -93,7 +91,6 @@ class BinaryRelation:
             if is_true:
                 properties_list.append(property_name)
         
-        print(symmetry_properties)
         if symmetry_properties["Антисимметрично"]:
             properties_list.append("Антисимметрично")
         else:
