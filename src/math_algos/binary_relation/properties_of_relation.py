@@ -51,7 +51,7 @@ class BinaryRelation:
 
     def check_symmetry_properties(self):
         is_symmetric = all((b, a) in self.relation_set for a, b in self.relation_set)
-        is_asymmetric = all((b, a) not in self.relation_set for a, b in self.relation_set if a != b)
+        is_asymmetric = all((b, a) not in self.relation_set for a, b in self.relation_set) and not is_symmetric
         is_antisymmetric = all((b, a) not in self.relation_set or a == b for a, b in self.relation_set) and not is_asymmetric
         is_nonsymmetric = not is_symmetric and not is_asymmetric and any((b, a) in self.relation_set for a, b in self.relation_set if a != b)
 
@@ -93,6 +93,7 @@ class BinaryRelation:
             if is_true:
                 properties_list.append(property_name)
         
+        print(symmetry_properties)
         if symmetry_properties["Антисимметрично"]:
             properties_list.append("Антисимметрично")
         else:
