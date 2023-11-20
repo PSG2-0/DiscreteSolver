@@ -58,6 +58,7 @@
 
 - <b>Binary relationships:</b>
     - Calculating properties of a binary relation <u>(k6zma)</u>
+    - Generating graph of a binary relation <u>(k6zma)</u>
 
 - <b>Coding:</b>
     - Arithmetic encoding/decoding <u>(k6zma)</u>
