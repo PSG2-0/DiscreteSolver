@@ -40,7 +40,7 @@
 - <b>k6zma</b> <i>(@k6zma)</i> - Algorithms, API, DevOps, ML, TG Bot
 - <b>std46d6b</b> <i>(@m4lvx)</i> - Design, Frontend
 - <b>taisssam</b> <i>(@taisssam)</i> - Algorithms, Android app, IOS app
-- <b>kir1l9x</b> <i>(@killmefasterdear)</i> - Dekstop app
+- <b>kir1l9x</b> <i>(@killmefasterdear)</i> - Algorithms, Dekstop app
 
 ## Current stage of development:
 - <b>Set theory:</b>
