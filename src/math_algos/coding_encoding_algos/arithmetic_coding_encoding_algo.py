@@ -1,6 +1,6 @@
 from decimal import Decimal, getcontext
 
-getcontext().prec = 81
+getcontext().prec = 500
 
 class Segment:
     def __init__(self, left, right, character=None):
