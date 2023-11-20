@@ -10,11 +10,13 @@ from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
+from src.math_algos.coding_encoding_algos.huffman_encoding_decoding import HuffmanCoding
 from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
 from src.math_algos.bulean_algebra.truth_table import TruthTableGenerator
 from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
 import matplotlib
 from typing import Optional
+from pydantic import BaseModel
 
 matplotlib.use('Agg')
 
@@ -27,6 +29,7 @@ def get_relation_properties(set_of_elements: str = Body(...), binary_relation: s
     try:
         relation = BinaryRelation(set_of_elements, binary_relation)
         properties_list = relation.get_properties_as_list()
+        
         return {"properties": properties_list}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -43,6 +46,7 @@ def generate_relation_graph(set_of_elements: Optional[str] = Body(default=None),
 
         graph = BinaryRelationGraph(elements_set, binary_relation_tuples)
         image_stream = graph.get_image()
+
         return StreamingResponse(image_stream, media_type="image/png")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -53,6 +57,7 @@ def simplify_set(expression: str = Body(...)):
         simplifier = SetSimplifier()
         simplified_expr = simplifier.simplify_expression(expression)
         result = simplifier.reverse_transform(simplified_expr)
+
         return {"simplified_expression": result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -79,6 +84,7 @@ def calculate_elements_of_set(expression: str = Body(...), variable_values: str 
         calculator = SetCalculator()
         calculator.parse_variable_values(variable_values)
         result_set = calculator.calculate(expression)
+
         return {"result_set": result_set}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -115,16 +121,44 @@ def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] =
         length = len(alphabet)
         coder = ArithmeticCoder(alphabet, probabilities)
         decoded_string = coder.decode(encoded_value, original_length_of_string)
+
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
+@app.post("/huffman-encode/")
+def huffman_encode(string: str = Body(...)):
+    try:
+        huffman_coder = HuffmanCoding(string)
+        encoded_string = huffman_coder.encode(string)
+        alphabet_and_codes = huffman_coder.code_dict
+
+        return {
+            "encoded_string": encoded_string,
+            "codes": alphabet_and_codes,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/huffman-decode/")
+def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+    try:
+        alphabet = list(codes.keys())
+        probabilities = [len(code) for code in codes.values()]
+        huffman_coder = HuffmanCoding.recreate_from_alphabet_and_probabilities(alphabet, probabilities)
+        decoded_string = huffman_coder.decode(encoded_string, codes)
+
+        return {"decoded_string": decoded_string}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.post("/simplify-boolean-expression/")
 def simplify_boolean_expression(expression: str = Body(...)):
     try:
         simplifier = LogicSimplifier()
         simplified_expr = simplifier.simplify_expression(expression)
-        result = simplifier.reverse_transform(simplified_expr)
+        result = simplifier.reverse_transform(simplified_expr
+                                              )
         return {"simplified_expression": result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))    
@@ -134,6 +168,7 @@ async def generate_truth_table_endpoint(expression: str = Body(...)):
     try:
         generator = TruthTableGenerator(expression)
         image_buffer = generator.create_truth_table_image()
+
         return StreamingResponse(image_buffer, media_type="image/png")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))    
