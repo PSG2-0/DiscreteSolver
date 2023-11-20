@@ -12,6 +12,11 @@ from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
 from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
 from src.math_algos.bulean_algebra.truth_table import TruthTableGenerator
+from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
+import matplotlib
+from typing import Optional
+
+matplotlib.use('Agg')
 
 getcontext().prec = 500
 
@@ -23,6 +28,22 @@ def get_relation_properties(set_of_elements: str = Body(...), binary_relation: s
         relation = BinaryRelation(set_of_elements, binary_relation)
         properties_list = relation.get_properties_as_list()
         return {"properties": properties_list}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/generate-relation-graph/")
+def generate_relation_graph(set_of_elements: Optional[str] = Body(default=None), binary_relation: str = Body(...)):
+    try:
+        binary_relation_tuples = [tuple(int(x) for x in pair.split(',')) for pair in binary_relation.replace(" ", "").strip('()').split("),(")]
+
+        if not set_of_elements:
+            elements_set = {element for pair in binary_relation_tuples for element in pair}
+        else:
+            elements_set = {int(x) for x in set_of_elements.replace(" ", "").split(',')}
+
+        graph = BinaryRelationGraph(elements_set, binary_relation_tuples)
+        image_stream = graph.get_image()
+        return StreamingResponse(image_stream, media_type="image/png")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
