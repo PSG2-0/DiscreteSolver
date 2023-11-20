@@ -88,6 +88,27 @@ def calculate_elements_of_set(expression: str = Body(...), variable_values: str 
         return {"result_set": result_set}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/simplify-boolean-expression/")
+def simplify_boolean_expression(expression: str = Body(...)):
+    try:
+        simplifier = LogicSimplifier()
+        simplified_expr = simplifier.simplify_expression(expression)
+        result = simplifier.reverse_transform(simplified_expr
+                                              )
+        return {"simplified_expression": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))    
+    
+@app.post("/generate-truth-table/")
+async def generate_truth_table_endpoint(expression: str = Body(...)):
+    try:
+        generator = TruthTableGenerator(expression)
+        image_buffer = generator.create_truth_table_image()
+
+        return StreamingResponse(image_buffer, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/arithmetic-encode/")
 def arithmetic_encode(string: str = Body(...)):
@@ -149,27 +170,6 @@ def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
         decoded_string = huffman_coder.decode(encoded_string, codes)
 
         return {"decoded_string": decoded_string}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.post("/simplify-boolean-expression/")
-def simplify_boolean_expression(expression: str = Body(...)):
-    try:
-        simplifier = LogicSimplifier()
-        simplified_expr = simplifier.simplify_expression(expression)
-        result = simplifier.reverse_transform(simplified_expr
-                                              )
-        return {"simplified_expression": result}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))    
-    
-@app.post("/generate-truth-table/")
-async def generate_truth_table_endpoint(expression: str = Body(...)):
-    try:
-        generator = TruthTableGenerator(expression)
-        image_buffer = generator.create_truth_table_image()
-
-        return StreamingResponse(image_buffer, media_type="image/png")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))    
     
