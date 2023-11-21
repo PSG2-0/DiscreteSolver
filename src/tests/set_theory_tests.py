@@ -16,8 +16,8 @@ class TestSetSimplifier(unittest.TestCase):
         self.assertEqual(str(self.simplifier.simplify_expression("not(A) ∩ not(B) ∪ A ∩ B ∪ not(A) ∩ B")), "B | ~A")
 
     def test_reverse_transform(self):
-        self.assertEqual(self.simplifier.reverse_transform("A & ~B"), "A ∩ not B")
-        self.assertEqual(self.simplifier.reverse_transform("~A"), "not A")
+        self.assertEqual(self.simplifier.reverse_transform("A & ~B"), "A ∩ not(B)")
+        self.assertEqual(self.simplifier.reverse_transform("~A"), "not(A)")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
