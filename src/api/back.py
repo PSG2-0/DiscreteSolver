@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
 from src.math_algos.coding_encoding_algos.huffman_encoding_decoding import HuffmanCoding
+from src.math_algos.coding_encoding_algos.fixed_length_coding_encoding import FixedLengthCoding
 from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
 from src.math_algos.bulean_algebra.truth_table import TruthTableGenerator
 from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
@@ -160,7 +161,25 @@ def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))    
-    
+
+@app.post("/fixed_length-encode/")
+def fixed_length_encode(string: str = Body(...)):
+    coder = FixedLengthCoding(string)
+    encoded_string = coder.encode(string)
+    alphabet_dict = coder.char_to_code
+
+    return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
+
+@app.post("/fixed_length-decode/")
+def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(...)):
+    alphabet_string = ''.join(alphabet.keys())
+    coder = FixedLengthCoding(alphabet_string)
+    coder.char_to_code = alphabet
+    coder.code_to_char = {v: k for k, v in alphabet.items()}
+    decoded_string = coder.decode(encoded_string)
+
+    return {"decoded_string": decoded_string}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
