@@ -186,7 +186,7 @@ def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(.
 def shennon_fano_encode(string: str = Body(...)):
     try:
         coder = ShennonFanoCoding(string)
-        encoded_string = coder.encode(string)
+        encoded_string = coder.encode()
         code_dict = coder.code_dict
 
         return {
