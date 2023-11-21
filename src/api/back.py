@@ -8,7 +8,6 @@ from src.math_algos.binary_relation.properties_of_relation import BinaryRelation
 from src.math_algos.set_theory.set_simplifier import SetSimplifier
 from fastapi.responses import FileResponse
 from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
-from src.math_algos.set_theory.calc_elements_of_set import SetCalculator
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
 from src.math_algos.coding_encoding_algos.huffman_encoding_decoding import HuffmanCoding
 from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
@@ -75,17 +74,6 @@ async def create_venn_diagram(expression: str = Body(...)):
                 raise HTTPException(status_code=500, detail="Error while collecting an image")
         else:
             raise HTTPException(status_code=400, detail=diagram_url)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.post("/calculate-set/")
-def calculate_elements_of_set(expression: str = Body(...), variable_values: str = Body(...)):
-    try:
-        calculator = SetCalculator()
-        calculator.parse_variable_values(variable_values)
-        result_set = calculator.calculate(expression)
-
-        return {"result_set": result_set}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
