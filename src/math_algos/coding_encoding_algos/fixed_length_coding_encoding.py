@@ -1,6 +1,6 @@
 import math
 
-class UniformCoding:
+class FixedLengthCoding:
     def __init__(self, string):
         self.alphabet = sorted(list(set(string)))
         self.char_to_code = {}
