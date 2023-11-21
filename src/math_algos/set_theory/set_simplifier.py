@@ -8,7 +8,7 @@ class SetSimplifier:
         self.replacements = {
             '∩': '&',
             '∪': '|',
-            '\\': '-',
+            '\\': '& ~',
             'not(': '~(',
             '∅': 'False',
             'U': 'True',
@@ -17,7 +17,7 @@ class SetSimplifier:
         self.reverse_replacements = {
             '&': '∩',
             '|': '∪',
-            '-': '\\',
+            '& ~': '\\',
             '~': 'not ',
             'False': '∅',
             'True': 'U',
