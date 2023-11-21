@@ -11,9 +11,11 @@ from src.math_algos.set_theory.building_diagram import VennDiagramBuilder
 from src.math_algos.coding_encoding_algos.arithmetic_coding_encoding_algo import ProbabilityCalculating, ArithmeticCoder
 from src.math_algos.coding_encoding_algos.huffman_encoding_decoding import HuffmanCoding
 from src.math_algos.coding_encoding_algos.fixed_length_coding_encoding import FixedLengthCoding
+from src.math_algos.coding_encoding_algos.shenon_fano_coding_encoding import ShennonFanoCoding
 from src.math_algos.bulean_algebra.bulean_simplifier import LogicSimplifier
 from src.math_algos.bulean_algebra.truth_table import TruthTableGenerator
 from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
+
 import matplotlib
 from typing import Optional
 from pydantic import BaseModel
@@ -179,6 +181,31 @@ def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(.
     decoded_string = coder.decode(encoded_string)
 
     return {"decoded_string": decoded_string}
+
+@app.post("/shennon_fano_encode/")
+def shennon_fano_encode(string: str = Body(...)):
+    try:
+        coder = ShennonFanoCoding(string)
+        encoded_string = coder.encode(string)
+        code_dict = coder.code_dict
+
+        return {
+            "encoded_string": encoded_string,
+            "codes": code_dict,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/shennon_fano_decode/")
+def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+    try:
+        coder = ShennonFanoCoding("")
+        coder.code_dict = codes
+        decoded_string = coder.decode(encoded_string)
+
+        return {"decoded_string": decoded_string}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
