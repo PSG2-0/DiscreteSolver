@@ -45,4 +45,5 @@ class SetSimplifier:
         for old, new in self.reverse_replacements.items():
             reversed_str = reversed_str.replace(old, new)
         reversed_str = re.sub(r'~\(?([A-Za-z0-9_]+)\)?', r'not(\1)', reversed_str)
+        reversed_str = re.sub(r'not\s+(\b[A-Za-z0-9_]+\b)', r'not(\1)', reversed_str)
         return reversed_str
