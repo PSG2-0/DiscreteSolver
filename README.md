@@ -34,7 +34,6 @@
 - <b>Set theory:</b>
     - Simplifying Set Expressions <u>(k6zma)</u>
     - Constructing Euler-Venn diagrams <u>(k6zma)</u>
-    - Calculating Set Elements <u>(k6zma)</u>
 
 - <b>Bulean Algebra:</b>
     - Bulding Carno cards <u>(taissam)</u>
