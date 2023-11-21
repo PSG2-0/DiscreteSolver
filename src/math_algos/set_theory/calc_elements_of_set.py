@@ -7,7 +7,7 @@ class SetCalculator:
         self.replacements = {
             '∩': '&',
             '∪': '|',
-            '\\': '-',
+            '\\': '& ~',
             '∅': 'set()',
             'U': 'set()',
             '∆': '^',
