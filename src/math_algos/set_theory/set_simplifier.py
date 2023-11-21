@@ -1,5 +1,6 @@
 from sympy import symbols, simplify_logic
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
+
 import re
 
 class SetSimplifier:

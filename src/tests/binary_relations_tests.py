@@ -1,6 +1,8 @@
 import unittest
+
 from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
 from src.math_algos.binary_relation.properties_of_relation import BinaryRelation
+
 from io import BytesIO
 
 class TestBinaryRelationGraph(unittest.TestCase):

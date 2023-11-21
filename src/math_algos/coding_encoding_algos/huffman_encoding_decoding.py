@@ -1,6 +1,6 @@
 import heapq
+
 from decimal import Decimal
-from collections import OrderedDict
 
 class HuffmanCoding:
     def __init__(self, string=None, alphabet=None, probabilities=None):

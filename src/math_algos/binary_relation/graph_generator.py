@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+
 from io import BytesIO
 
 class BinaryRelationGraph:

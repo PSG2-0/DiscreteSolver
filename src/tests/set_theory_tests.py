@@ -1,4 +1,5 @@
 import unittest
+
 from src.math_algos.set_theory.set_simplifier import SetSimplifier
 
 class TestSetSimplifier(unittest.TestCase):

@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import quote
+
 from ..set_theory.set_simplifier import SetSimplifier
 
 class VennDiagramBuilder:

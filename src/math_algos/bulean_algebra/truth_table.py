@@ -1,8 +1,11 @@
 from itertools import product
+
 import matplotlib.pyplot as plt
 import numpy as np
-from io import BytesIO
+
 from ..bulean_algebra.bulean_simplifier import LogicSimplifier
+
+from io import BytesIO
 
 class TruthTableGenerator:
     def __init__(self, expression):
