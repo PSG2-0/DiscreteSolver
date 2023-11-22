@@ -49,7 +49,7 @@
 
 - <b>Coding:</b>
     - Arithmetic encoding/decoding <u>(k6zma)</u>
-    - Huffman encoding/decoding <u>(kir1l9x)</u> (need refub)
+    - Huffman encoding/decoding <u>(kir1l9x)</u>
 
 ## Example of working:
 ### Screenshot from API documentation:
