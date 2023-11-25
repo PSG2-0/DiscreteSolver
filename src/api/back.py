@@ -8,7 +8,7 @@ import matplotlib
 
 from src.math_algos.set_theory import SetSimplifier, VennDiagramBuilder
 from src.math_algos.binary_relations import BinaryRelation, BinaryRelationGraph
-from src.math_algos.bulean_algebra import LogicSimplifier, TruthTableGenerator
+from math_algos.boolean_algebra import LogicSimplifier, TruthTableGenerator
 from src.math_algos.encoding_decoding_algos import ProbabilityCalculating, ArithmeticCoder, HuffmanCoding, FixedLengthCoding, ShennonFanoCoding
 
 matplotlib.use('Agg')
