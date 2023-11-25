@@ -5,10 +5,11 @@ from decimal import Decimal, getcontext
 import io
 import requests
 import matplotlib
+import math
 
 from src.math_algos.set_theory import SetSimplifier, VennDiagramBuilder
 from src.math_algos.binary_relations import BinaryRelation, BinaryRelationGraph
-from math_algos.boolean_algebra import LogicSimplifier, TruthTableGenerator
+from src.math_algos.boolean_algebra import LogicSimplifier, TruthTableGenerator
 from src.math_algos.encoding_decoding_algos import ProbabilityCalculating, ArithmeticCoder, HuffmanCoding, FixedLengthCoding, ShennonFanoCoding
 
 matplotlib.use('Agg')
@@ -18,12 +19,12 @@ MEDIA_TYPE_PNG = "image/png"
 app = FastAPI(title="DiscreteSolver API")
 
 @app.post("/relation-properties/")
-def get_relation_properties(set_of_elements: str = Body(...), binary_relation: str = Body(...)) -> dict:
+async def get_relation_properties(set_of_elements: str = Body(...), binary_relation: str = Body(...)) -> dict:
     relation = BinaryRelation(set_of_elements, binary_relation)
     return {"properties": relation.get_properties_as_list()}
 
 @app.post("/generate-relation-graph/")
-def generate_relation_graph(set_of_elements: Optional[str] = Body(default=None), binary_relation: str = Body(...)) -> StreamingResponse:
+async def generate_relation_graph(set_of_elements: Optional[str] = Body(default=None), binary_relation: str = Body(...)) -> StreamingResponse:
     try:
         relation = BinaryRelation(set_of_elements, binary_relation)
         graph = BinaryRelationGraph(relation.elements, relation.relation_set)
@@ -32,7 +33,7 @@ def generate_relation_graph(set_of_elements: Optional[str] = Body(default=None),
         raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
 
 @app.post("/simplify-boolean-expression/")
-def simplify_boolean_expression(expression: str = Body(...)) -> dict:
+async def simplify_boolean_expression(expression: str = Body(...)) -> dict:
     simplifier = LogicSimplifier()
     try:
         simplified_expr = simplifier.simplify_expression(expression)
@@ -54,7 +55,7 @@ async def create_venn_diagram(expression: str = Body(...)) -> StreamingResponse:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/simplify-boolean-expression/")
-def simplify_boolean_expression(expression: str = Body(...)) -> dict:
+async def simplify_boolean_expression(expression: str = Body(...)) -> dict:
     simplifier = LogicSimplifier()
     simplified_expr = simplifier.simplify_expression(expression)
     return {"simplified_expression": str(simplified_expr)}
@@ -67,9 +68,19 @@ async def generate_truth_table_endpoint(expression: str = Body(...)):
         return StreamingResponse(image_buffer, media_type=MEDIA_TYPE_PNG)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/calculate-entropy/")
+async def get_entropy(string: str = Body(...)):
+    probability_calculator = ProbabilityCalculating(string)
+    letters, probabilities = probability_calculator.get_probabilities()
     
+    probabilities_float = [float(prob) for prob in probabilities]
+    
+    entropy = -sum(p * math.log2(p) for p in probabilities_float if p > 0)
+    return {"entropy": entropy}
+
 @app.post("/arithmetic-encode/")
-def arithmetic_encode(string: str = Body(...)):
+async def arithmetic_encode(string: str = Body(...)):
     try:
         probability_calculator = ProbabilityCalculating(string)
         coder = ArithmeticCoder(probability_calculator)
@@ -85,7 +96,7 @@ def arithmetic_encode(string: str = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/arithmetic-decode/")
-def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] = Body(...), alphabet: List[str] = Body(...), original_length_of_string: int = Body(...)):
+async def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] = Body(...), alphabet: List[str] = Body(...), original_length_of_string: int = Body(...)):
     try:
         if len(alphabet) != len(probabilities):
             raise ValueError("Alphabet and probabilities list must be of the same length")
@@ -99,7 +110,6 @@ def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] =
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    
 def create_probability_calculator_from_data(alphabet: List[str], probabilities: List[Decimal]) -> ProbabilityCalculating:
     probability_calculator = ProbabilityCalculating('')
     probability_calculator.letter_counts = {letter: count for letter, count in zip(alphabet, probabilities)}
@@ -107,7 +117,7 @@ def create_probability_calculator_from_data(alphabet: List[str], probabilities: 
     return probability_calculator
 
 @app.post("/huffman-encode/")
-def huffman_encode(string: str = Body(...)):
+async def huffman_encode(string: str = Body(...)):
     try:
         probability_calculator = ProbabilityCalculating(string)
         huffman_coder = HuffmanCoding(probability_calculator)
@@ -117,7 +127,7 @@ def huffman_encode(string: str = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/huffman-decode/")
-def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+async def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
     try:
         huffman_coder = HuffmanCoding(ProbabilityCalculating(encoded_string))
         decoded_string = huffman_coder.decode(encoded_string, codes)
@@ -126,7 +136,7 @@ def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))  
 
 @app.post("/fixed_length-encode/")
-def fixed_length_encode(string: str = Body(...)):
+async def fixed_length_encode(string: str = Body(...)):
     try:
         coder = FixedLengthCoding(string)
         encoded_string, alphabet_dict = coder.encode()
@@ -135,7 +145,7 @@ def fixed_length_encode(string: str = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/fixed_length-decode/")
-def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(...)):
+async def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(...)):
     try:
         coder = FixedLengthCoding.from_alphabet(alphabet)
         return {"decoded_string": coder.decode(encoded_string)}
@@ -143,7 +153,7 @@ def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(.
         raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/shennon_fano_encode/")
-def shennon_fano_encode(string: str = Body(...)):
+async def shennon_fano_encode(string: str = Body(...)):
     try:
         coder = ShennonFanoCoding(ProbabilityCalculating(string))
         encoded_string = coder.encode(string)
@@ -152,7 +162,7 @@ def shennon_fano_encode(string: str = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/shennon_fano_decode/")
-def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
     try:
         coder = ShennonFanoCoding.recreate_from_codes(codes)
         decoded_string = coder.decode(encoded_string)
