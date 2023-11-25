@@ -70,18 +70,25 @@ class TruthTableGenerator:
         variables, rows, results = self.generate_truth_table()
         data = []
 
-        for row in rows:
-            data.append([self.boolean_to_int(val) for val in row] + [self.boolean_to_int(results[len(data)])])
+        for index, row in enumerate(rows):
+            data.append([index] + [self.boolean_to_int(val) for val in row] + [self.boolean_to_int(results[index])])
 
         fig, ax = plt.subplots()
         data = np.array(data)
         ax.axis('tight')
         ax.axis('off')
 
-        table = ax.table(cellText=data, colLabels=variables + [self.expression], cellLoc='center', loc='center')
+        col_width = 0.2
+        col_labels = [''] + variables + [self.expression]
+        col_widths = [col_width] * (len(variables) + 2)
+        col_widths[-1] = 0.8
+
+        table = ax.table(cellText=data, colLabels=col_labels, cellLoc='center', loc='center', colWidths=col_widths)
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1, 1.5)
+
+        table[0, 0]._text.set_text("№")
 
         buffer = BytesIO()
         plt.savefig(buffer, format='png', bbox_inches='tight', pad_inches=0.05)
