@@ -58,6 +58,7 @@ async def create_venn_diagram(expression: str = Body(...)) -> StreamingResponse:
 async def simplify_boolean_expression(expression: str = Body(...)) -> dict:
     simplifier = LogicSimplifier()
     simplified_expr = simplifier.simplify_expression(expression)
+    simplified_expr = simplifier.reverse_transform(simplified_expr)
     return {"simplified_expression": str(simplified_expr)}
 
 @app.post("/generate-truth-table/")
@@ -72,7 +73,7 @@ async def generate_truth_table_endpoint(expression: str = Body(...)):
 @app.post("/calculate-entropy/")
 async def get_entropy(string: str = Body(...)):
     probability_calculator = ProbabilityCalculating(string)
-    letters, probabilities = probability_calculator.get_probabilities()
+    probabilities = probability_calculator.get_probabilities().values()
     
     probabilities_float = [float(prob) for prob in probabilities]
     
@@ -137,40 +138,42 @@ async def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))  
 
-@app.post("/fixed_length-encode/")
-async def fixed_length_encode(string: str = Body(...)):
-    try:
-        coder = FixedLengthCoding(string)
-        encoded_string, alphabet_dict = coder.encode()
-        return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @app.post("/fixed_length-encode/")
+# async def fixed_length_encode(string: str = Body(...)):
+#     try:
+#         coder = FixedLengthCoding(string)
+#         encoded_string = coder.encode(string)
+#         alphabet_dict = coder.get_alphabet_dict()
+#         return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
+        
+# @app.post("/fixed_length_decode/")
+# async def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(...)):
+#     coding = FixedLengthCoding.recreate_from_alphabet(alphabet)
 
-@app.post("/fixed_length-decode/")
-async def fixed_length_decode(encoded_string: str = Body(...), alphabet: dict = Body(...)):
-    try:
-        coder = FixedLengthCoding.from_alphabet(alphabet)
-        return {"decoded_string": coder.decode(encoded_string)}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    
-@app.post("/shennon_fano_encode/")
-async def shennon_fano_encode(string: str = Body(...)):
-    try:
-        coder = ShennonFanoCoding(ProbabilityCalculating(string))
-        encoded_string = coder.encode(string)
-        return {"encoded_string": encoded_string, "codes": coder.code_dict}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+#     decoded_string = coding.decode(encoded_string)
 
-@app.post("/shennon_fano_decode/")
-async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
-    try:
-        coder = ShennonFanoCoding.recreate_from_codes(codes)
-        decoded_string = coder.decode(encoded_string)
-        return {"decoded_string": decoded_string}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+#     return {"decoded_string": decoded_string}
+
+
+# @app.post("/shennon_fano_encode/")
+# async def shennon_fano_encode(string: str = Body(...)):
+#     try:
+#         coder = ShennonFanoCoding(ProbabilityCalculating(string))
+#         encoded_string = coder.encode(string)
+#         return {"encoded_string": encoded_string, "codes": coder.code_dict}
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
+
+# @app.post("/shennon_fano_decode/")
+# async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+#     try:
+#         coder = ShennonFanoCoding.recreate_from_codes(codes)
+#         decoded_string = coder.decode(encoded_string)
+#         return {"decoded_string": decoded_string}
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

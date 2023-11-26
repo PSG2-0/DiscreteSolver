@@ -75,6 +75,14 @@ class FixedLengthCoding:
             self.char_to_code[char] = binary_code
             self.code_to_char[binary_code] = char
 
+    @staticmethod
+    def recreate_from_alphabet(alphabet):
+        instance = FixedLengthCoding('')
+        instance.code_length = math.ceil(math.log2(len(alphabet)))
+        instance.code_to_char = alphabet
+        instance.char_to_code = {v: k for k, v in alphabet.items()}
+        return instance
+
     def encode(self, string):
         return ''.join(self.char_to_code.get(char, '') for char in string)
 
@@ -82,8 +90,8 @@ class FixedLengthCoding:
         return ''.join(self.code_to_char[encoded_string[i:i + self.code_length]]
                        for i in range(0, len(encoded_string), self.code_length))
 
-    def get_alphabet_list(self):
-        return list(self.char_to_code.items())    
+    def get_alphabet_dict(self):
+        return {char: self.char_to_code[char] for char in self.alphabet}    
     
 class ShennonFanoCoding:
     def __init__(self, probability_calculator):
@@ -115,32 +123,19 @@ class ShennonFanoCoding:
         return code_dict
 
     def encode(self, string):
-        return ''.join(self.code_dict[char] for char in string)
-
-    @classmethod
-    def recreate_from_codes(cls, codes):
-        instance = cls(ProbabilityCalculating(''))
-        instance.code_dict = codes
-        return instance
+        return ''.join(self.char_to_code.get(char, '') for char in string)
 
     def decode(self, encoded_string):
-        reverse_code_dict = {v: k for k, v in self.code_dict.items()}
-        decoded_string = ''
-        code = ''
-        for bit in encoded_string:
-            code += bit
-            if code in reverse_code_dict:
-                decoded_string += reverse_code_dict[code]
-                code = ''
-        return decoded_string
+        return ''.join(self.code_to_char[encoded_string[i:i + self.code_length]]
+                       for i in range(0, len(encoded_string), self.code_length))
 
-    def create_codes(self):
-        return self.create_code_tree(self.sorted_symbols)
+    def get_alphabet_list(self):
+        return self.char_to_code 
 
 class HuffmanCoding:
     def __init__(self, probability_calculator):
         self.probability_calculator = probability_calculator
-        self.letters, self.probabilities = probability_calculator.get_probabilities()
+        self.letters, self.probabilities = zip(*probability_calculator.get_probabilities().items())
         self.root = self.build_huffman_tree()
         self.code_dict = self.build_huffman_code()
 
