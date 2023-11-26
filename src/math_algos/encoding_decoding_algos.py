@@ -3,7 +3,7 @@ from collections import defaultdict
 import math
 import heapq
 
-getcontext().prec = 500
+getcontext().prec = 100
 
 class Segment:
     def __init__(self, left, right, character=None):
@@ -16,7 +16,7 @@ class ProbabilityCalculating:
         self.string = string
         self.letter_counts = self.calculate_letter_counts(string)
         self.total_letters = Decimal(len(string))
-    
+
     @staticmethod
     def calculate_letter_counts(string):
         counts = defaultdict(Decimal)
@@ -25,21 +25,20 @@ class ProbabilityCalculating:
         return counts
 
     def get_probabilities(self):
-        sorted_letters_counts = sorted(self.letter_counts.items())
-        letters = [letter for letter, _ in sorted_letters_counts]
-        probabilities = [count / self.total_letters for _, count in sorted_letters_counts]
-        return letters, probabilities
+        return {letter: count / self.total_letters for letter, count in sorted(self.letter_counts.items())}
 
 class ArithmeticCoder:
     def __init__(self, probability_calculator):
-        self.segments = self.define_segments(*probability_calculator.get_probabilities())
+        self.segments = self.define_segments(probability_calculator.get_probabilities())
 
-    def define_segments(self, letters, probabilities):
+    def define_segments(self, probabilities_dict):
+        sorted_probabilities = sorted(probabilities_dict.items(), key=lambda x: (Decimal(x[1]), x[0]))
         segment_dict = {}
         left = Decimal(0)
-        for letter, prob in zip(letters, probabilities):
+        for letter, prob in sorted_probabilities:
+            prob = Decimal(prob)
             segment_dict[letter] = Segment(left, left + prob, letter)
-            left = segment_dict[letter].right
+            left += prob
         return segment_dict
 
     def encode(self, string):

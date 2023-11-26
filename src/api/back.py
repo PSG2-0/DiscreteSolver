@@ -13,7 +13,7 @@ from src.math_algos.boolean_algebra import LogicSimplifier, TruthTableGenerator
 from src.math_algos.encoding_decoding_algos import ProbabilityCalculating, ArithmeticCoder, HuffmanCoding, FixedLengthCoding, ShennonFanoCoding
 
 matplotlib.use('Agg')
-getcontext().prec = 500
+getcontext().prec = 100
 MEDIA_TYPE_PNG = "image/png"
 
 app = FastAPI(title="DiscreteSolver API")
@@ -85,25 +85,27 @@ async def arithmetic_encode(string: str = Body(...)):
         probability_calculator = ProbabilityCalculating(string)
         coder = ArithmeticCoder(probability_calculator)
         encoded_value = coder.encode(string)
-        letters, probabilities = probability_calculator.get_probabilities()
+        probabilities_dict = probability_calculator.get_probabilities()
+
+        sorted_probabilities = sorted(probabilities_dict.items(), key=lambda x: (x[1], x[0]))
+        alphabet_dict = {letter: str(prob) for letter, prob in sorted_probabilities}
+        
         return {
             "encoded_value": str(encoded_value),
-            "probabilities": [str(prob) for prob in probabilities],
-            "alphabet": letters,
+            "alphabet_and_probabilities": alphabet_dict,
             "original_length_of_string": len(string),
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/arithmetic-decode/")
-async def arithmetic_decode(encoded_value: str = Body(...), probabilities: List[str] = Body(...), alphabet: List[str] = Body(...), original_length_of_string: int = Body(...)):
+async def arithmetic_decode(encoded_value: str = Body(...), alphabet_and_probabilities: dict = Body(...), original_length_of_string: int = Body(...)):
     try:
-        if len(alphabet) != len(probabilities):
-            raise ValueError("Alphabet and probabilities list must be of the same length")
-
-        decimal_probabilities = [Decimal(p) for p in probabilities]
-        probability_calculator = create_probability_calculator_from_data(alphabet, decimal_probabilities)
-
+        probability_calculator = ProbabilityCalculating('')
+        total_letters = Decimal(original_length_of_string)
+        probability_calculator.letter_counts = {letter: Decimal(prob) * total_letters 
+                                                for letter, prob in alphabet_and_probabilities.items()}
+        probability_calculator.total_letters = total_letters
         coder = ArithmeticCoder(probability_calculator)
         decoded_string = coder.decode(Decimal(encoded_value), original_length_of_string)
         return {"decoded_string": decoded_string}
