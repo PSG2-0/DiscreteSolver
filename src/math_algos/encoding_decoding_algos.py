@@ -66,7 +66,8 @@ class FixedLengthCoding:
         self.alphabet = sorted(list(set(string)))
         self.char_to_code = {}
         self.code_to_char = {}
-        self.code_length = math.ceil(math.log2(len(self.alphabet)))
+        if string != '':  # fix `recreate_from_alphabet()` initialisation
+            self.code_length = math.ceil(math.log2(len(self.alphabet)))
         self.generate_codes()
 
     def generate_codes(self):
@@ -79,8 +80,8 @@ class FixedLengthCoding:
     def recreate_from_alphabet(alphabet):
         instance = FixedLengthCoding('')
         instance.code_length = math.ceil(math.log2(len(alphabet)))
-        instance.code_to_char = alphabet
-        instance.char_to_code = {v: k for k, v in alphabet.items()}
+        instance.code_to_char = {v: k for k, v in alphabet.items()}
+        instance.char_to_code = alphabet
         return instance
 
     def encode(self, string):
@@ -96,8 +97,9 @@ class FixedLengthCoding:
 class ShennonFanoCoding:
     def __init__(self, probability_calculator):
         self.probability_calculator = probability_calculator
-        self.sorted_symbols = sorted(zip(*probability_calculator.get_probabilities()), key=lambda x: (-x[1], -ord(x[0])))
-        self.code_dict = self.create_codes()
+        self.sorted_symbols = sorted(probability_calculator.get_probabilities().items(), key=lambda x: (-x[1], -ord(x[0])))
+        self.char_to_code = self.create_code_tree(self.sorted_symbols)
+        self.code_to_char = {v: k for k, v in self.char_to_code.items()}
 
     def split_into_parts(self, symbols):
         total = sum(weight for _, weight in symbols)
@@ -122,12 +124,25 @@ class ShennonFanoCoding:
         code_dict.update(self.create_code_tree(right, prefix + '1'))
         return code_dict
 
+    @classmethod
+    def recreate_from_codes(cls, codes):
+        instance = cls(ProbabilityCalculating(''))
+        instance.char_to_code = codes
+        instance.code_to_char = {v: k for k, v in codes.items()}
+        return instance
+
     def encode(self, string):
         return ''.join(self.char_to_code.get(char, '') for char in string)
 
     def decode(self, encoded_string):
-        return ''.join(self.code_to_char[encoded_string[i:i + self.code_length]]
-                       for i in range(0, len(encoded_string), self.code_length))
+        decoded_string = ''
+        code = ''
+        for bit in encoded_string:
+            code += bit
+            if code in self.code_to_char:
+                decoded_string += self.code_to_char[code]
+                code = ''
+        return decoded_string
 
     def get_alphabet_list(self):
         return self.char_to_code 
