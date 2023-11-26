@@ -1,9 +1,9 @@
 import unittest
+from io import BytesIO
 
 from src.math_algos.binary_relation.graph_generator import BinaryRelationGraph
 from src.math_algos.binary_relation.properties_of_relation import BinaryRelation
 
-from io import BytesIO
 
 class TestBinaryRelationGraph(unittest.TestCase):
     def test_initialization_with_non_empty_set(self):
@@ -30,6 +30,7 @@ class TestBinaryRelationGraph(unittest.TestCase):
         graph = BinaryRelationGraph({1, 2}, {(1, 2)})
         img = graph.get_image()
         self.assertIsInstance(img, BytesIO)
+
 
 class TestBinaryRelationProperties(unittest.TestCase):
     def test_initialization(self):
@@ -70,7 +71,9 @@ class TestBinaryRelationProperties(unittest.TestCase):
 
         self.assertTrue(binary_relation.check_reflexive_property()["Нерефлексивно"])
         self.assertTrue(binary_relation.check_symmetry_properties()["Симметрично"])
-        self.assertTrue(binary_relation.check_transitivity_properties()["Антитранзитивно"])
+        self.assertTrue(
+            binary_relation.check_transitivity_properties()["Антитранзитивно"]
+        )
 
     def test_third_set(self):
         elements = "Алекскей,Иван,Петр,Александр,Павел,Андрей"
@@ -88,7 +91,10 @@ class TestBinaryRelationProperties(unittest.TestCase):
 
         self.assertTrue(binary_relation.check_reflexive_property()["Рефлексивно"])
         self.assertTrue(binary_relation.check_symmetry_properties()["Несимметрично"])
-        self.assertTrue(binary_relation.check_transitivity_properties()["Нетранзитивно"])      
+        self.assertTrue(
+            binary_relation.check_transitivity_properties()["Нетранзитивно"]
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main(verbosity=2)

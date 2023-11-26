@@ -1,34 +1,49 @@
-from sympy import symbols, simplify_logic
-from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
 import re
+from io import BytesIO
 from itertools import product
+
 import matplotlib.pyplot as plt
 import numpy as np
-from io import BytesIO
+from sympy import simplify_logic, symbols
+from sympy.parsing.sympy_parser import (
+    implicit_multiplication_application,
+    parse_expr,
+    standard_transformations,
+)
+
 
 class LogicSimplifier:
     def __init__(self):
-        self.transformations = standard_transformations + (implicit_multiplication_application,)
+        self.transformations = standard_transformations + (
+            implicit_multiplication_application,
+        )
 
     def extract_variables(self, expr_str):
-        return set(re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', expr_str))
+        return set(re.findall(r"\b[a-zA-Z_][a-zA-Z0-9_]*\b", expr_str))
 
     def simplify_expression(self, expr_str):
         variables = self.extract_variables(expr_str)
         sympy_symbols = {var: symbols(var) for var in variables}
         local_dict = sympy_symbols.copy()
 
-        expr_str = expr_str.replace('∧', '&').replace('∨', '|').replace('⊕', '^').replace('¬', '~')
-        expr_str = expr_str.replace('←', '<<').replace('→', '>>')
-        expr_str = expr_str.replace('≡', '==')
+        expr_str = (
+            expr_str.replace("∧", "&")
+            .replace("∨", "|")
+            .replace("⊕", "^")
+            .replace("¬", "~")
+        )
+        expr_str = expr_str.replace("←", "<<").replace("→", ">>")
+        expr_str = expr_str.replace("≡", "==")
 
-        expr_str = re.sub(r'(\b\w+)\s*==\s*(\b\w+)', r'Equivalent(\1, \2)', expr_str)
-        expr_str = re.sub(r'(\b\w+)\s*↓\s*(\b\w+)', r'Not(Or(\1, \2))', expr_str)
-        expr_str = re.sub(r'(\b\w+)\s*↑\s*(\b\w+)', r'Not(And(\1, \2))', expr_str)
+        expr_str = re.sub(r"(\b\w+)\s*==\s*(\b\w+)", r"Equivalent(\1, \2)", expr_str)
+        expr_str = re.sub(r"(\b\w+)\s*↓\s*(\b\w+)", r"Not(Or(\1, \2))", expr_str)
+        expr_str = re.sub(r"(\b\w+)\s*↑\s*(\b\w+)", r"Not(And(\1, \2))", expr_str)
 
         try:
-            expr = parse_expr(expr_str, transformations=self.transformations, local_dict=local_dict)
-            simplified_expr = simplify_logic(expr, form='dnf', force=True)
+            expr = parse_expr(
+                expr_str, transformations=self.transformations, local_dict=local_dict
+            )
+            simplified_expr = simplify_logic(expr, form="dnf", force=True)
             return simplified_expr
         except Exception as e:
             print(f"Error parsing expression: {expr_str}")
@@ -36,13 +51,14 @@ class LogicSimplifier:
 
     def reverse_transform(self, simplified_expr):
         expr_str = str(simplified_expr)
-        expr_str = expr_str.replace('&', '∧').replace('|', '∨')
-        expr_str = expr_str.replace('^', '⊕').replace('Nor', '↓')
-        expr_str = expr_str.replace('==', '≡').replace('~', '¬')
-        expr_str = expr_str.replace('<<', '←').replace('>>', '→')
-        expr_str = expr_str.replace('Nand', '↑')
+        expr_str = expr_str.replace("&", "∧").replace("|", "∨")
+        expr_str = expr_str.replace("^", "⊕").replace("Nor", "↓")
+        expr_str = expr_str.replace("==", "≡").replace("~", "¬")
+        expr_str = expr_str.replace("<<", "←").replace(">>", "→")
+        expr_str = expr_str.replace("Nand", "↑")
 
         return expr_str
+
 
 class TruthTableGenerator:
     def __init__(self, expression):
@@ -71,19 +87,29 @@ class TruthTableGenerator:
         data = []
 
         for index, row in enumerate(rows):
-            data.append([index] + [self.boolean_to_int(val) for val in row] + [self.boolean_to_int(results[index])])
+            data.append(
+                [index]
+                + [self.boolean_to_int(val) for val in row]
+                + [self.boolean_to_int(results[index])]
+            )
 
         fig, ax = plt.subplots()
         data = np.array(data)
-        ax.axis('tight')
-        ax.axis('off')
+        ax.axis("tight")
+        ax.axis("off")
 
         col_width = 0.2
-        col_labels = [''] + variables + [self.expression]
+        col_labels = [""] + variables + [self.expression]
         col_widths = [col_width] * (len(variables) + 2)
         col_widths[-1] = 0.8
 
-        table = ax.table(cellText=data, colLabels=col_labels, cellLoc='center', loc='center', colWidths=col_widths)
+        table = ax.table(
+            cellText=data,
+            colLabels=col_labels,
+            cellLoc="center",
+            loc="center",
+            colWidths=col_widths,
+        )
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1, 1.5)
@@ -91,7 +117,7 @@ class TruthTableGenerator:
         table[0, 0]._text.set_text("№")
 
         buffer = BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight', pad_inches=0.05)
+        plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0.05)
         plt.close(fig)
         buffer.seek(0)
 
