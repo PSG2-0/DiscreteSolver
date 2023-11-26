@@ -32,15 +32,15 @@ async def generate_relation_graph(set_of_elements: Optional[str] = Body(default=
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
 
-@app.post("/simplify-boolean-expression/")
-async def simplify_boolean_expression(expression: str = Body(...)) -> dict:
-    simplifier = LogicSimplifier()
+@app.post("/simplify-set/")
+def simplify_set(expression: str = Body(...)):
     try:
+        simplifier = SetSimplifier()
         simplified_expr = simplifier.simplify_expression(expression)
-        readable_expr = simplifier.reverse_transform(simplified_expr)
-        return {"simplified_expression": readable_expr}
+        result = simplifier.reverse_transform(simplified_expr)
+        return {"simplified_expression": result}
     except Exception as e:
-        return {"error": f"Failed to simplify expression. Error: {str(e)}"}
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/venn-diagram/")
 async def create_venn_diagram(expression: str = Body(...)) -> StreamingResponse:
