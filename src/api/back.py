@@ -218,6 +218,18 @@ async def arithmetic_encode(string: str = Body(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@app.post("/arithmetic-encode-interval-table/")
+async def arithmetic_encode_interval_table(string: str = Body(...)):
+    try:
+        probability_calculator = ProbabilityCalculating(string)
+        coder = ArithmeticCoder(probability_calculator)
+        coder.encode(string)
+        image = coder.create_encoding_intervals_image(string)
+        return StreamingResponse(image, media_type=MEDIA_TYPE_PNG)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app.post("/arithmetic-decode/")
 async def arithmetic_decode(
     encoded_value: str = Body(...),

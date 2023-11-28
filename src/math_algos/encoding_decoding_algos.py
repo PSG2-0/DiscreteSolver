@@ -3,6 +3,10 @@ import math
 from collections import defaultdict
 from decimal import Decimal, getcontext
 
+import matplotlib.pyplot as plt
+import numpy as np
+from io import BytesIO
+
 getcontext().prec = 100
 
 
@@ -57,6 +61,42 @@ class ArithmeticCoder:
             new_left = left + (right - left) * segment.left
             left, right = new_left, new_right
         return (left + right) / 2
+
+    def create_encoding_intervals_image(self, string):
+        left, right = Decimal(0), Decimal(1)
+        intervals_data = []
+
+        for symb in string:
+            segment = self.segments[symb]
+            new_right = left + (right - left) * segment.right
+            new_left = left + (right - left) * segment.left
+            intervals_data.append([symb, str(new_left), str(new_right)])
+            left, right = new_left, new_right
+
+        fig, ax = plt.subplots()
+        ax.axis("tight")
+        ax.axis("off")
+
+        column_labels = ["Symbol", "Left Interval", "Right Interval"]
+        table = ax.table(
+            cellText=intervals_data,
+            colLabels=column_labels,
+            cellLoc="center",
+            loc="center",
+        )
+
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1, 2)
+
+        table.auto_set_column_width(col=[1, 2])
+
+        buffer = BytesIO()
+        plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0.05)
+        plt.close(fig)
+        buffer.seek(0)
+
+        return buffer
 
     def decode(self, code, length):
         code = Decimal(code)
