@@ -121,7 +121,13 @@ async def fixed_length_encode(string: str = Body(...)):
         coder = FixedLengthCoding(string)
         encoded_string = coder.encode(string)
         alphabet_dict = coder.get_alphabet_dict()
-        return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
+        average_code_length = coder.average_code_length()
+
+        return {
+            "encoded_string": encoded_string,
+            "alphabet": alphabet_dict,
+            "average_code_length": average_code_length,
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -142,7 +148,13 @@ async def shennon_fano_encode(string: str = Body(...)):
     try:
         coder = ShennonFanoCoding(ProbabilityCalculating(string))
         encoded_string = coder.encode(string)
-        return {"encoded_string": encoded_string, "codes": coder.char_to_code}
+        average_code_length = coder.average_code_length()
+
+        return {
+            "encoded_string": encoded_string,
+            "codes": coder.char_to_code,
+            "average_code_length": average_code_length,
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -152,6 +164,33 @@ async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Bod
     try:
         coder = ShennonFanoCoding.recreate_from_codes(codes)
         decoded_string = coder.decode(encoded_string)
+        return {"decoded_string": decoded_string}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/huffman-encode/")
+async def huffman_encode(string: str = Body(...)):
+    try:
+        probability_calculator = ProbabilityCalculating(string)
+        huffman_coder = HuffmanCoding(probability_calculator)
+        encoded_string = huffman_coder.encode(string)
+        average_code_length = huffman_coder.average_code_length()
+
+        return {
+            "encoded_string": encoded_string,
+            "codes": huffman_coder.code_dict,
+            "average_code_length": average_code_length,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/huffman-decode/")
+async def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+    try:
+        huffman_coder = HuffmanCoding(ProbabilityCalculating(encoded_string))
+        decoded_string = huffman_coder.decode(encoded_string, codes)
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -195,27 +234,6 @@ async def arithmetic_decode(
         probability_calculator.total_letters = total_letters
         coder = ArithmeticCoder(probability_calculator)
         decoded_string = coder.decode(Decimal(encoded_value), original_length_of_string)
-        return {"decoded_string": decoded_string}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/huffman-encode/")
-async def huffman_encode(string: str = Body(...)):
-    try:
-        probability_calculator = ProbabilityCalculating(string)
-        huffman_coder = HuffmanCoding(probability_calculator)
-        encoded_string = huffman_coder.encode(string)
-        return {"encoded_string": encoded_string, "codes": huffman_coder.code_dict}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/huffman-decode/")
-async def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
-    try:
-        huffman_coder = HuffmanCoding(ProbabilityCalculating(encoded_string))
-        decoded_string = huffman_coder.decode(encoded_string, codes)
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

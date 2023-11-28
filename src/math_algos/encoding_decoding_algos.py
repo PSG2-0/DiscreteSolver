@@ -105,6 +105,9 @@ class FixedLengthCoding:
     def get_alphabet_dict(self):
         return {char: self.char_to_code[char] for char in self.alphabet}
 
+    def average_code_length(self):
+        return self.code_length
+
 
 class ShennonFanoCoding:
     def __init__(self, probability_calculator):
@@ -159,8 +162,16 @@ class ShennonFanoCoding:
                 code = ""
         return decoded_string
 
-    def get_alphabet_list(self):
+    def get_alphabet_dict(self):
         return self.char_to_code
+
+    def average_code_length(self):
+        probabilities = self.probability_calculator.get_probabilities()
+        average_length = sum(
+            len(self.char_to_code[letter]) * prob
+            for letter, prob in probabilities.items()
+        )
+        return average_length
 
 
 class HuffmanCoding:
@@ -254,3 +265,10 @@ class HuffmanCoding:
                     break
 
         return decoded_string
+
+    def average_code_length(self):
+        probabilities = self.probability_calculator.get_probabilities()
+        average_length = sum(
+            len(self.code_dict[letter]) * prob for letter, prob in probabilities.items()
+        )
+        return average_length
