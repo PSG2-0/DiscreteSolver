@@ -98,23 +98,25 @@ class TruthTableGenerator:
         ax.axis("tight")
         ax.axis("off")
 
-        col_width = 0.2
         col_labels = [""] + variables + [self.expression]
-        col_widths = [col_width] * (len(variables) + 2)
-        col_widths[-1] = 0.8
+        fixed_column_width = 0.2
+        column_widths = [fixed_column_width] * (len(col_labels) - 1) + [0.2]
 
         table = ax.table(
             cellText=data,
             colLabels=col_labels,
             cellLoc="center",
             loc="center",
-            colWidths=col_widths,
+            colWidths=column_widths,
         )
+
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1, 1.5)
 
         table[0, 0]._text.set_text("№")
+
+        table.auto_set_column_width(col=[len(col_labels) - 1])
 
         buffer = BytesIO()
         plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0.05)
