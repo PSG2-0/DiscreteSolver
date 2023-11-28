@@ -75,7 +75,7 @@ class FixedLengthCoding:
         self.alphabet = sorted(list(set(string)))
         self.char_to_code = {}
         self.code_to_char = {}
-        if string != "":  # fix `recreate_from_alphabet()` initialisation
+        if string != "":
             self.code_length = math.ceil(math.log2(len(self.alphabet)))
         self.generate_codes()
 

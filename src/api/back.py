@@ -104,6 +104,59 @@ async def get_entropy(string: str = Body(...)):
     return {"entropy": entropy}
 
 
+def create_probability_calculator_from_data(
+    alphabet: List[str], probabilities: List[Decimal]
+) -> ProbabilityCalculating:
+    probability_calculator = ProbabilityCalculating("")
+    probability_calculator.letter_counts = {
+        letter: count for letter, count in zip(alphabet, probabilities)
+    }
+    probability_calculator.total_letters = sum(probabilities)
+    return probability_calculator
+
+
+@app.post("/fixed_length-encode/")
+async def fixed_length_encode(string: str = Body(...)):
+    try:
+        coder = FixedLengthCoding(string)
+        encoded_string = coder.encode(string)
+        alphabet_dict = coder.get_alphabet_dict()
+        return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/fixed_length_decode/")
+async def fixed_length_decode(
+    encoded_string: str = Body(...), alphabet: dict = Body(...)
+):
+    coding = FixedLengthCoding.recreate_from_alphabet(alphabet)
+
+    decoded_string = coding.decode(encoded_string)
+
+    return {"decoded_string": decoded_string}
+
+
+@app.post("/shennon_fano_encode/")
+async def shennon_fano_encode(string: str = Body(...)):
+    try:
+        coder = ShennonFanoCoding(ProbabilityCalculating(string))
+        encoded_string = coder.encode(string)
+        return {"encoded_string": encoded_string, "codes": coder.char_to_code}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/shennon_fano_decode/")
+async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
+    try:
+        coder = ShennonFanoCoding.recreate_from_codes(codes)
+        decoded_string = coder.decode(encoded_string)
+        return {"decoded_string": decoded_string}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app.post("/arithmetic-encode/")
 async def arithmetic_encode(string: str = Body(...)):
     try:
@@ -147,17 +200,6 @@ async def arithmetic_decode(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def create_probability_calculator_from_data(
-    alphabet: List[str], probabilities: List[Decimal]
-) -> ProbabilityCalculating:
-    probability_calculator = ProbabilityCalculating("")
-    probability_calculator.letter_counts = {
-        letter: count for letter, count in zip(alphabet, probabilities)
-    }
-    probability_calculator.total_letters = sum(probabilities)
-    return probability_calculator
-
-
 @app.post("/huffman-encode/")
 async def huffman_encode(string: str = Body(...)):
     try:
@@ -174,48 +216,6 @@ async def huffman_decode(encoded_string: str = Body(...), codes: dict = Body(...
     try:
         huffman_coder = HuffmanCoding(ProbabilityCalculating(encoded_string))
         decoded_string = huffman_coder.decode(encoded_string, codes)
-        return {"decoded_string": decoded_string}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/fixed_length-encode/")
-async def fixed_length_encode(string: str = Body(...)):
-    try:
-        coder = FixedLengthCoding(string)
-        encoded_string = coder.encode(string)
-        alphabet_dict = coder.get_alphabet_dict()
-        return {"encoded_string": encoded_string, "alphabet": alphabet_dict}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/fixed_length_decode/")
-async def fixed_length_decode(
-    encoded_string: str = Body(...), alphabet: dict = Body(...)
-):
-    coding = FixedLengthCoding.recreate_from_alphabet(alphabet)
-
-    decoded_string = coding.decode(encoded_string)
-
-    return {"decoded_string": decoded_string}
-
-
-@app.post("/shennon_fano_encode/")
-async def shennon_fano_encode(string: str = Body(...)):
-    try:
-        coder = ShennonFanoCoding(ProbabilityCalculating(string))
-        encoded_string = coder.encode(string)
-        return {"encoded_string": encoded_string, "codes": coder.char_to_code}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/shennon_fano_decode/")
-async def shennon_fano_decode(encoded_string: str = Body(...), codes: dict = Body(...)):
-    try:
-        coder = ShennonFanoCoding.recreate_from_codes(codes)
-        decoded_string = coder.decode(encoded_string)
         return {"decoded_string": decoded_string}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
