@@ -29,7 +29,7 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        scp deploy.sh k6zma@194.146.242.41:/home/k6zma/projects/DiscreteSolver/
+        scp -v deploy.sh k6zma@194.146.242.41:/home/k6zma/projects/DiscreteSolver/
         ssh k6zma@194.146.242.41 'bash /home/k6zma/projects/DiscreteSolver/deploy.sh'
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
