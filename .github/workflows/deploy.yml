@@ -32,5 +32,5 @@ jobs:
 
     - name: Start Docker Compose
       run: |
-        cd /home/k6zma/projects/DiscreteSolver/
+        cd projects/DiscreteSolver/
         docker-compose up --build
