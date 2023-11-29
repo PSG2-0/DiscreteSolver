@@ -13,15 +13,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: SSH into the server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+    - name: SSH into the server and execute commands
       run: |
-        cd /home/k6zma/projects/DiscreteSolver/
-        git pull
-        docker-compose down
-        docker-compose up --build
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && git pull'
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && docker-compose down'
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && docker-compose up --build'
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
