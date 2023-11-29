@@ -20,17 +20,8 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Update code on server
       run: |
         cd /home/k6zma/projects/DiscreteSolver/
         git pull
-
-    - name: Stop and remove Docker containers
-      run: |
-        cd /home/k6zma/projects/DiscreteSolver/
         docker-compose down
-
-    - name: Start Docker Compose
-      run: |
-        cd /home/k6zma/projects/DiscreteSolver/
         docker-compose up --build
