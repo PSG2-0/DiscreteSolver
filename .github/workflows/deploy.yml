@@ -1,24 +1,26 @@
-name: Deploy on Push
+name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: SSH into the server and execute commands
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+    - name: Deploy to Server
       run: |
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && git pull'
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && docker-compose down'
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd /home/k6zma/projects/DiscreteSolver/ && docker-compose up --build'
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-        SERVER_IP: ${{ secrets.SERVER_IP }}
+        ssh -o StrictHostKeyChecking=no k6zma@194.146.242.41 << 'ENDSSH'
+        cd /home/k6zma/projects/DiscreteSolver
+        git pull
+        docker-compose down
+        docker-compose up --build -d
+        ENDSSH
