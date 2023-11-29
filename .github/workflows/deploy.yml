@@ -13,11 +13,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Create SSH directory
+      run: mkdir -p $HOME/.ssh
+
     - name: Add SSH key to known hosts
       run: |
         echo "$SERVER_SSH_KEY" >> $HOME/.ssh/known_hosts
       env:
         SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+
+    - name: Set permissions on SSH directory and files
+      run: |
+        chmod 700 $HOME/.ssh
+        chmod 600 $HOME/.ssh/known_hosts
 
     - name: Deploy to Server
       run: |
