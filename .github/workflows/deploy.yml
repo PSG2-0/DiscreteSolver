@@ -22,12 +22,12 @@ jobs:
 
     - name: Update code on server
       run: |
-        cd /home/k6zma/projects/DiscreteSolver/
+        cd projects/DiscreteSolver/
         git pull
 
     - name: Stop and remove Docker containers
       run: |
-        cd /home/k6zma/projects/DiscreteSolver/
+        cd projects/DiscreteSolver/
         docker-compose down
 
     - name: Start Docker Compose
