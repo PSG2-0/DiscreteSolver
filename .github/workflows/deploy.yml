@@ -13,9 +13,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Add SSH key to known hosts
+      run: |
+        echo "$SERVER_SSH_KEY" >> $HOME/.ssh/known_hosts
+      env:
+        SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+
     - name: Deploy to Server
       run: |
-        scp deploy.sh k6zma@194.146.242.41:home/k6zma/projects/DiscreteSolver/
-        ssh k6zma@194.146.242.41 'bash home/k6zma/projects/DiscreteSolver/'
+        scp deploy.sh k6zma@194.146.242.41:/home/k6zma/projects/DiscreteSolver/
+        ssh k6zma@194.146.242.41 'bash /home/k6zma/projects/DiscreteSolver/deploy.sh'
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
