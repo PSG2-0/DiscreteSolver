@@ -8,7 +8,10 @@ import requests
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 
-from src.math_algos.binary_relations import BinaryRelation, BinaryRelationGraph
+from src.math_algos.binary_relations import (
+    BinaryRelationGraph,
+    BinaryRelationProperties,
+)
 from src.math_algos.boolean_algebra import LogicSimplifier, TruthTableGenerator
 from src.math_algos.encoding_decoding_algos import (
     ArithmeticCoder,
@@ -19,6 +22,8 @@ from src.math_algos.encoding_decoding_algos import (
 )
 from src.math_algos.set_theory import SetSimplifier, VennDiagramBuilder
 
+from .models import BinaryRelationModel, GetRelationPropertiesModel
+
 matplotlib.use("Agg")
 getcontext().prec = 100
 MEDIA_TYPE_PNG = "image/png"
@@ -26,22 +31,16 @@ MEDIA_TYPE_PNG = "image/png"
 app = FastAPI(title="DiscreteSolver API")
 
 
-@app.post("/relation-properties/")
-async def get_relation_properties(
-    set_of_elements: str = Body(...), binary_relation: str = Body(...)
-) -> dict:
-    relation = BinaryRelation(set_of_elements, binary_relation)
+@app.post("/relation-properties/", response_model=GetRelationPropertiesModel)
+async def get_relation_properties(model: BinaryRelationModel) -> dict:
+    relation = BinaryRelationProperties(model.set_of_elements, model.binary_relation)
     return {"properties": relation.get_properties_as_list()}
 
 
 @app.post("/generate-relation-graph/")
-async def generate_relation_graph(
-    set_of_elements: Optional[str] = Body(default=None),
-    binary_relation: str = Body(...),
-) -> StreamingResponse:
+async def generate_relation_graph(model: BinaryRelationModel) -> StreamingResponse:
     try:
-        relation = BinaryRelation(set_of_elements, binary_relation)
-        graph = BinaryRelationGraph(relation.elements, relation.relation_set)
+        graph = BinaryRelationGraph(model.set_of_elements, model.binary_relation)
         return StreamingResponse(graph.get_image(), media_type=MEDIA_TYPE_PNG)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
