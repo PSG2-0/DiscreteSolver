@@ -1,19 +1,19 @@
 from abc import ABC
 from io import BytesIO
-from typing import Optional
+from typing import Optional, Union
 
 import matplotlib.pyplot as plt
 import networkx as nx
 
 
 class BinaryRelation(ABC):
-    set_of_elements: set[str | int]
-    binary_relation = set[tuple[str | int, str | int]]
+    set_of_elements: set[Union[str, int]]
+    binary_relation = set[tuple[Union[str, int], Union[str, int]]]
 
     def __init__(
         self,
-        set_of_elements: Optional[set[str | int]],
-        binary_relation: set[tuple[str | int, str | int]],
+        set_of_elements: Optional[set[Union[str, int]]],
+        binary_relation: set[tuple[Union[str, int], Union[str, int]]],
     ):
         if not set_of_elements:
             self.set_of_elements = set(
@@ -105,8 +105,8 @@ class BinaryRelationProperties(BinaryRelation):
 class BinaryRelationGraph(BinaryRelation):
     def __init__(
         self,
-        set_of_elements: Optional[set[str | int]],
-        binary_relation: set[tuple[str | int, str | int]],
+        set_of_elements: Optional[set[Union[str, int]]],
+        binary_relation: set[tuple[Union[str, int], Union[str, int]]],
     ):
         super().__init__(set_of_elements, binary_relation)
         self.graph = nx.DiGraph()
