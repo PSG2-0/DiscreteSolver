@@ -7,13 +7,13 @@ import networkx as nx
 
 
 class BinaryRelation(ABC):
-    set_of_elements: set[Union[str, int]]
-    binary_relation = set[tuple[Union[str, int], Union[str, int]]]
+    set_of_elements: set[str]
+    binary_relation = set[tuple[str, str]]
 
     def __init__(
         self,
-        set_of_elements: Optional[set[Union[str, int]]],
-        binary_relation: set[tuple[Union[str, int], Union[str, int]]],
+        set_of_elements: Optional[set[str]],
+        binary_relation: set[tuple[str, str]],
     ):
         if not set_of_elements:
             self.set_of_elements = set(
@@ -105,8 +105,8 @@ class BinaryRelationProperties(BinaryRelation):
 class BinaryRelationGraph(BinaryRelation):
     def __init__(
         self,
-        set_of_elements: Optional[set[Union[str, int]]],
-        binary_relation: set[tuple[Union[str, int], Union[str, int]]],
+        set_of_elements: Optional[set[str]],
+        binary_relation: set[tuple[str, str]],
     ):
         super().__init__(set_of_elements, binary_relation)
         self.graph = nx.DiGraph()

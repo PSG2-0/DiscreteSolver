@@ -33,14 +33,18 @@ app = FastAPI(title="DiscreteSolver API")
 
 @app.post("/relation-properties/", response_model=GetRelationPropertiesModel)
 async def get_relation_properties(model: BinaryRelationModel) -> dict:
-    relation = BinaryRelationProperties(model.set_of_elements, model.binary_relation)
+    relation = BinaryRelationProperties(
+        model.get_set_of_elements(), model.get_binary_relation()
+    )
     return {"properties": relation.get_properties_as_list()}
 
 
 @app.post("/generate-relation-graph/")
 async def generate_relation_graph(model: BinaryRelationModel) -> StreamingResponse:
     try:
-        graph = BinaryRelationGraph(model.set_of_elements, model.binary_relation)
+        graph = BinaryRelationGraph(
+            model.get_set_of_elements(), model.get_binary_relation()
+        )
         return StreamingResponse(graph.get_image(), media_type=MEDIA_TYPE_PNG)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
